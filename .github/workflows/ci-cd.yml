@@ -55,6 +55,8 @@ jobs:
         username: ${{ secrets.SSH_USERNAME }}
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT }}
+        script_stop: true
+        debug: true
         script: |
           cd /var/www/jisung-park
           echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" > .env
