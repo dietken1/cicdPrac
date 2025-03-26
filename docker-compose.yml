@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: jisung-park-db
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=jisungpark
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+    restart: always
+    networks:
+      - app-network
+
+  backend:
+    build: ./backend
+    container_name: jisung-park-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/jisungpark
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - db
+    image: ${DOCKER_USERNAME}/jisung-park-backend:latest
+    networks:
+      - app-network
+
+  front:
+    build: 
+      context: ./front
+      dockerfile: Dockerfile
+    container_name: jisung-park-front
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    image: ${DOCKER_USERNAME}/jisung-park-front:latest
+    networks:
+      - app-network
+
+volumes:
+  db-data:
+
+networks:
+  app-network:
+    driver: bridge
